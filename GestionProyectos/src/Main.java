@@ -1,25 +1,27 @@
-
+// Main.java
 import javax.swing.SwingUtilities;
-import vista.SistemaReservasGUI;
-
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+import vista.LoginDialog;
+import vista.VuelosGUI;
 
 /**
- *
- * @author jh599
+ * Clase principal que inicia la aplicación.
+ * Primero muestra el LoginDialog y luego la interfaz principal.
  */
 public class Main {
-    // === Main ===
-public static void main(String[] args) {
-    try {
-    Class.forName("com.itextpdf.kernel.pdf.PdfWriter");
-    Class.forName("org.slf4j.LoggerFactory");
-    System.out.println("✅ iText y SLF4J están disponibles");
-} catch (ClassNotFoundException e) {
-    System.err.println("❌ Falta una librería: " + e.getMessage());
-}
-}
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            LoginDialog login = new LoginDialog(null); 
+            login.setVisible(true);
+
+            if (login.isLoginExitoso()) {
+                int idUsuario = login.getUsuarioLogueado().getIdUsuario();
+                String nombreUsuario = login.getUsuarioLogueado().getNombre();
+
+                new VuelosGUI(idUsuario, nombreUsuario).setVisible(true);
+                login.dispose();
+            } else {
+                System.exit(0);
+            }
+        });
+    }
 }

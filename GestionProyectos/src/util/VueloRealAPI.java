@@ -38,7 +38,7 @@ public class VueloRealAPI {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(API_URL))
-                .timeout(java.time.Duration.ofSeconds(15)) // Aumentado para estabilidad
+                .timeout(java.time.Duration.ofSeconds(15)) 
                 .GET()
                 .build();
 
@@ -77,13 +77,13 @@ public class VueloRealAPI {
                     }
                 }
 
-                System.out.println("✅ API: " + vuelos.size() + " vuelos en tiempo real procesados.");
+                System.out.println("API: " + vuelos.size() + " vuelos en tiempo real procesados.");
             } else {
-                System.err.println("❌ API responded with status: " + response.statusCode());
+                System.err.println("API responded with status: " + response.statusCode());
             }
 
         } catch (IOException | InterruptedException e) {
-            System.err.println("❌ Error de conexión con OpenSky API:");
+            System.err.println("Error de conexión con OpenSky API:");
             e.printStackTrace();
         }
 

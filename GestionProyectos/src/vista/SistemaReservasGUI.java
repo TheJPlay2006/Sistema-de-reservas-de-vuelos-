@@ -3,368 +3,303 @@ package vista;
 
 import dao.ReservaDAO;
 import dao.VueloDAO;
-import java.awt.*;
-import java.awt.event.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.JOptionPane;
 import modelo.Reserva;
 import modelo.Vuelo;
 import modelo.Aerolinea;
 import modelo.Usuario;
 import util.VueloRealAPI;
 import util.ConexionBD;
+import com.lowagie.text.Document;
+import com.lowagie.text.Element;
+import com.lowagie.text.Font;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.Chunk;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
+import java.awt.Color;
+import java.io.FileOutputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
- * Interfaz gráfica principal del sistema de reservas.
- * Incluye login, búsqueda local, vuelos en el aire y posibilidad de agregarlos al sistema.
+ * Clase de controlador para el sistema de reservas.
+ * Contiene toda la lógica de negocio, pero NO interfaz gráfica.
  */
-public class SistemaReservasGUI extends JFrame {
+public class SistemaReservasGUI {
 
-    private JTable tablaVuelos;
-    private DefaultTableModel modeloVuelos;
-    private JTable tablaReservas;
-    private DefaultTableModel modeloReservas;
-    private JTextField txtOrigen, txtDestino;
-    private JSpinner spinnerFecha;
-    private ReservaDAO reservaDAO;
-    private VueloDAO vueloDAO;
     private int idUsuario;
     private String nombreUsuario;
+    private ReservaDAO reservaDAO;
+    private VueloDAO vueloDAO;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public SistemaReservasGUI() {
-        // === Mostrar login primero ===
-        LoginDialog login = new LoginDialog(this);
-        login.setVisible(true);
-
-        if (!login.isLoginExitoso()) {
-            System.exit(0);
-        }
-
-        Usuario usuario = login.getUsuarioLogueado();
-        this.idUsuario = usuario.getIdUsuario();
-        this.nombreUsuario = usuario.getNombre();
-
-        // Inicializar DAOs
+    // Constructor que recibe el usuario logueado
+    public SistemaReservasGUI(int idUsuario, String nombreUsuario) {
+        this.idUsuario = idUsuario;
+        this.nombreUsuario = nombreUsuario;
         this.reservaDAO = new ReservaDAO();
         this.vueloDAO = new VueloDAO();
-
-        // Configuración de la ventana
-        setTitle("✈️ Sistema de Reservas - Bienvenido, " + nombreUsuario);
-        setSize(950, 650);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setLayout(new BorderLayout());
-
-        // Crear pestañas
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("🔍 Buscar Vuelos", crearPanelBusqueda());
-        tabbedPane.addTab("🧳 Mi Itinerario", crearPanelItinerario());
-
-        // Barra de estado
-        JLabel statusBar = new JLabel("Usuario: " + nombreUsuario + " | ID: " + idUsuario);
-        statusBar.setBorder(BorderFactory.createLoweredBevelBorder());
-        add(statusBar, BorderLayout.SOUTH);
-
-        add(tabbedPane, BorderLayout.CENTER);
-
-        // Cargar datos iniciales
-        cargarVuelos();
-        cargarReservas();
-    }
-
-    // === PANEL DE BÚSQUEDA DE VUELOS ===
-    private JPanel crearPanelBusqueda() {
-        JPanel panel = new JPanel(new BorderLayout());
-
-        // Panel de filtros
-        JPanel panelFiltros = new JPanel(new FlowLayout());
-        panelFiltros.setBorder(BorderFactory.createTitledBorder("Filtros de Búsqueda"));
-
-        txtOrigen = new JTextField(10);
-        txtDestino = new JTextField(10);
-
-        LocalDate hoy = LocalDate.now();
-        SpinnerDateModel model = new SpinnerDateModel(
-            java.util.Date.from(hoy.atStartOfDay().atZone(java.time.ZoneId.systemDefault()).toInstant()),
-            null, null, java.util.Calendar.DAY_OF_MONTH);
-        spinnerFecha = new JSpinner(model);
-        JSpinner.DateEditor editor = new JSpinner.DateEditor(spinnerFecha, "yyyy-MM-dd");
-        spinnerFecha.setEditor(editor);
-
-        JButton btnBuscar = new JButton("Buscar Vuelos");
-        JButton btnLimpiar = new JButton("Limpiar");
-        JButton btnCargarReales = new JButton("☁️ Vuelos en el aire");
-
-        panelFiltros.add(new JLabel("Origen:"));
-        panelFiltros.add(txtOrigen);
-        panelFiltros.add(new JLabel("Destino:"));
-        panelFiltros.add(txtDestino);
-        panelFiltros.add(new JLabel("Fecha:"));
-        panelFiltros.add(spinnerFecha);
-        panelFiltros.add(btnBuscar);
-        panelFiltros.add(btnLimpiar);
-        panelFiltros.add(btnCargarReales);
-
-        // Tabla de resultados
-        String[] columnas = {"ID", "Aerolínea", "Núm. Vuelo", "Origen", "Destino", "Salida", "Asientos", "Precio"};
-        modeloVuelos = new DefaultTableModel(columnas, 0);
-        tablaVuelos = new JTable(modeloVuelos);
-        tablaVuelos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        JScrollPane scrollVuelos = new JScrollPane(tablaVuelos);
-
-        // Panel de botones
-        JPanel panelBotones = new JPanel(new FlowLayout());
-        JButton btnReservar = new JButton("✅ Hacer Reserva");
-        btnReservar.setBackground(new Color(46, 139, 87));
-        btnReservar.setForeground(Color.WHITE);
-
-        JButton btnAgregarVuelo = new JButton("➕ Agregar a mi sistema");
-        btnAgregarVuelo.setBackground(new Color(0, 102, 204));
-        btnAgregarVuelo.setForeground(Color.WHITE);
-
-        panelBotones.add(btnReservar);
-        panelBotones.add(btnAgregarVuelo);
-
-        // Añadir al panel principal
-        panel.add(panelFiltros, BorderLayout.NORTH);
-        panel.add(scrollVuelos, BorderLayout.CENTER);
-        panel.add(panelBotones, BorderLayout.SOUTH);
-
-        // === LISTENERS ===
-        btnBuscar.addActionListener(e -> cargarVuelos());
-
-        btnLimpiar.addActionListener(e -> {
-            txtOrigen.setText("");
-            txtDestino.setText("");
-            spinnerFecha.setValue(new java.util.Date());
-            cargarVuelos();
-        });
-
-        btnCargarReales.addActionListener(e -> {
-            modeloVuelos.setRowCount(0);
-            VueloRealAPI api = new VueloRealAPI();
-            List<Vuelo> vuelosReales = api.obtenerVuelosReales();
-
-            if (vuelosReales.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "❌ No se pudieron obtener vuelos en el aire.\nVerifique conexión a internet.");
-                return;
-            }
-
-            for (Vuelo v : vuelosReales) {
-                modeloVuelos.addRow(new Object[]{
-                    0,
-                    v.getAerolinea().getNombre(),
-                    v.getNumeroVuelo(),
-                    v.getOrigen(),
-                    v.getDestino(),
-                    v.getFechaSalida().format(formatter),
-                    v.getAsientosDisponibles(),
-                    String.format("%.2f", v.getPrecio())
-                });
-            }
-
-            JOptionPane.showMessageDialog(this, "✅ " + vuelosReales.size() + " vuelos en el aire cargados.");
-        });
-
-        btnReservar.addActionListener(e -> hacerReserva());
-
-        btnAgregarVuelo.addActionListener(e -> {
-            int fila = tablaVuelos.getSelectedRow();
-            if (fila == -1) {
-                JOptionPane.showMessageDialog(this, "⚠️ Seleccione un vuelo para agregar.");
-                return;
-            }
-
-            Object idObj = modeloVuelos.getValueAt(fila, 0);
-            if (idObj instanceof Integer && (Integer) idObj > 0) {
-                JOptionPane.showMessageDialog(this, "✅ Este vuelo ya está en tu sistema.");
-                return;
-            }
-
-            int confirm = JOptionPane.showConfirmDialog(
-                this,
-                "¿Desea agregar este vuelo a su sistema?\nPodrá reservar asientos como cualquier otro vuelo.",
-                "Agregar Vuelo",
-                JOptionPane.YES_NO_OPTION
-            );
-
-            if (confirm == JOptionPane.YES_OPTION) {
-                agregarVueloDesdeAPI(fila);
-            }
-        });
-
-        return panel;
-    }
-
-    // === PANEL DE ITINERARIO ===
-    private JPanel crearPanelItinerario() {
-        JPanel panel = new JPanel(new BorderLayout());
-
-        // Tabla de reservas
-        String[] columnas = {"ID", "Vuelo", "Ruta", "Salida", "Asientos", "Precio Total", "Fecha Reserva"};
-        modeloReservas = new DefaultTableModel(columnas, 0);
-        tablaReservas = new JTable(modeloReservas);
-        tablaReservas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        JScrollPane scrollReservas = new JScrollPane(tablaReservas);
-
-        // Panel de botones
-        JPanel panelBotones = new JPanel(new FlowLayout());
-
-        JButton btnCancelar = new JButton("🗑️ Cancelar Reserva");
-        btnCancelar.setBackground(Color.RED);
-        btnCancelar.setForeground(Color.WHITE);
-
-        JButton btnExportarPDF = new JButton("📄 Exportar a PDF");
-        btnExportarPDF.setBackground(new Color(255, 165, 0));
-        btnExportarPDF.setForeground(Color.WHITE);
-
-        panelBotones.add(btnCancelar);
-        panelBotones.add(btnExportarPDF);
-
-        panel.add(scrollReservas, BorderLayout.CENTER);
-        panel.add(panelBotones, BorderLayout.SOUTH);
-
-        // Listeners
-        btnCancelar.addActionListener(e -> cancelarReserva());
-        btnExportarPDF.addActionListener(e -> exportarItinerarioACSV());
-
-        return panel;
     }
 
     // === MÉTODOS DE NEGOCIO ===
 
-    private void cargarVuelos() {
-        modeloVuelos.setRowCount(0);
-        String origen = txtOrigen.getText().trim();
-        String destino = txtDestino.getText().trim();
-        LocalDate fecha = LocalDate.parse(
-            new java.text.SimpleDateFormat("yyyy-MM-dd").format(spinnerFecha.getValue()),
-            DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        );
-
-        List<Vuelo> vuelos = vueloDAO.buscarVuelos(
-            origen.isEmpty() ? null : origen,
-            destino.isEmpty() ? null : destino,
-            fecha
-        );
-
-        for (Vuelo v : vuelos) {
-            modeloVuelos.addRow(new Object[]{
-                v.getIdVuelo(),
-                v.getAerolinea().getNombre(),
-                v.getNumeroVuelo(),
-                v.getOrigen(),
-                v.getDestino(),
-                v.getFechaSalida().format(formatter),
-                v.getAsientosDisponibles(),
-                String.format("%.2f", v.getPrecio())
-            });
-        }
-
-        JOptionPane.showMessageDialog(this, "✈️ " + vuelos.size() + " vuelos encontrados en tu sistema.");
+    /**
+     * Carga los vuelos desde la base de datos según filtros.
+     * @param origen Origen del vuelo (puede ser null)
+     * @param destino Destino del vuelo (puede ser null)
+     * @param fecha Fecha de salida
+     * @return Lista de vuelos que coinciden
+     */
+    public List<Vuelo> buscarVuelos(String origen, String destino, LocalDate fecha) {
+        return vueloDAO.buscarVuelos(origen, destino, fecha);
     }
 
-    private void hacerReserva() {
-        int fila = tablaVuelos.getSelectedRow();
-        if (fila == -1) {
-            JOptionPane.showMessageDialog(this, "⚠️ Seleccione un vuelo para reservar.");
-            return;
-        }
-
-        Object idObj = modeloVuelos.getValueAt(fila, 0);
-        if (!(idObj instanceof Integer)) {
-            JOptionPane.showMessageDialog(this, "❌ No se puede reservar este vuelo.\nSolo los vuelos de tu sistema son reservables.");
-            return;
-        }
-
-        int idVuelo = (Integer) idObj;
-        if (idVuelo <= 0) {
-            JOptionPane.showMessageDialog(this, "🚫 Este vuelo es solo informativo.\nAgrégalo a tu sistema primero.");
-            return;
-        }
-
-        String numeroVuelo = (String) modeloVuelos.getValueAt(fila, 2);
-        int disponibles = (int) modeloVuelos.getValueAt(fila, 6);
-
-        String input = JOptionPane.showInputDialog(this, "¿Cuántos asientos desea reservar?\nDisponibles: " + disponibles, "Cantidad", JOptionPane.QUESTION_MESSAGE);
-        if (input == null) return;
-
-        int cantidad;
-        try {
-            cantidad = Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "❌ Ingrese un número válido.");
-            return;
-        }
-
-        if (cantidad <= 0 || cantidad > disponibles) {
-            JOptionPane.showMessageDialog(this, "❌ Cantidad inválida.");
-            return;
-        }
-
+    /**
+     * Realiza una reserva de un vuelo.
+     * @param idVuelo ID del vuelo a reservar
+     * @param cantidadAsientos Cantidad de asientos a reservar
+     * @return true si la reserva fue exitosa
+     */
+    public boolean hacerReserva(int idVuelo, int cantidadAsientos) {
         modelo.Usuario usuario = new modelo.Usuario();
         usuario.setIdUsuario(idUsuario);
 
         modelo.Vuelo vuelo = new modelo.Vuelo();
         vuelo.setIdVuelo(idVuelo);
-        vuelo.setNumeroVuelo(numeroVuelo);
-        vuelo.setAsientosDisponibles(disponibles);
-        vuelo.setPrecio(Double.parseDouble(modeloVuelos.getValueAt(fila, 7).toString()));
 
         Reserva reserva = new Reserva();
         reserva.setUsuario(usuario);
         reserva.setVuelo(vuelo);
-        reserva.setCantidadAsientos(cantidad);
+        reserva.setCantidadAsientos(cantidadAsientos);
 
-        if (reservaDAO.crearReserva(reserva)) {
-            JOptionPane.showMessageDialog(this, "🎉 ¡Reserva exitosa!\nVuelo: " + numeroVuelo + "\nAsientos: " + cantidad);
-            cargarVuelos();
-            cargarReservas();
+        boolean exito = reservaDAO.crearReserva(reserva);
+        if (exito) {
+            JOptionPane.showMessageDialog(null, "🎉 ¡Reserva exitosa!");
         } else {
-            JOptionPane.showMessageDialog(this, "❌ No se pudo completar la reserva.");
+            JOptionPane.showMessageDialog(null, "❌ No se pudo completar la reserva.");
         }
+        return exito;
     }
 
-    private void agregarVueloDesdeAPI(int fila) {
-        String numeroVuelo = (String) modeloVuelos.getValueAt(fila, 2);
-        String origen = (String) modeloVuelos.getValueAt(fila, 3);
-        String destino = (String) modeloVuelos.getValueAt(fila, 4);
-        String horaStr = (String) modeloVuelos.getValueAt(fila, 5);
-        int asientos = (int) modeloVuelos.getValueAt(fila, 6);
-        double precio = Double.parseDouble(modeloVuelos.getValueAt(fila, 7).toString());
-        String aerolineaNombre = (String) modeloVuelos.getValueAt(fila, 1);
+    /**
+     * Cancela una reserva existente.
+     * @param idReserva ID de la reserva a cancelar
+     * @return true si la cancelación fue exitosa
+     */
+    public boolean cancelarReserva(int idReserva) {
+        boolean exito = reservaDAO.cancelarReserva(idReserva);
+        if (exito) {
+            JOptionPane.showMessageDialog(null, "✅ Reserva cancelada con éxito.");
+        } else {
+            JOptionPane.showMessageDialog(null, "❌ No se pudo cancelar la reserva.");
+        }
+        return exito;
+    }
 
-        java.time.LocalDateTime fechaSalida;
-        try {
-            fechaSalida = java.time.LocalDateTime.parse(horaStr, formatter);
-        } catch (Exception ex) {
-            fechaSalida = java.time.LocalDateTime.now().plusHours(1);
+    /**
+     * Obtiene las reservas del usuario actual.
+     * @return Lista de reservas del usuario
+     */
+    public List<Reserva> obtenerReservasUsuario() {
+        return reservaDAO.obtenerReservasPorUsuario(idUsuario);
+    }
+
+    /**
+     * Obtiene vuelos en el aire desde la API.
+     * @return Lista de vuelos en tiempo real
+     */
+    public List<Vuelo> obtenerVuelosEnElAire() {
+        VueloRealAPI api = new VueloRealAPI();
+        return api.obtenerVuelosReales();
+    }
+
+    /**
+     * Agrega un vuelo de la API a la base de datos del sistema.
+     * @param vuelo Vuelo a agregar
+     * @return true si se agregó correctamente
+     */
+    public boolean agregarVueloDesdeAPI(Vuelo vuelo) {
+        int idAerolinea = obtenerOCrearAerolinea(vuelo.getAerolinea().getNombre());
+        if (idAerolinea == -1) {
+            JOptionPane.showMessageDialog(null, "❌ No se pudo registrar la aerolínea.");
+            return false;
         }
 
-        int idAerolinea = obtenerOCrearAerolinea(aerolineaNombre);
-        if (idAerolinea == -1) {
-            JOptionPane.showMessageDialog(this, "❌ No se pudo registrar la aerolínea.");
+        return insertarVueloEnBD(
+            idAerolinea,
+            vuelo.getNumeroVuelo(),
+            vuelo.getOrigen(),
+            vuelo.getDestino(),
+            vuelo.getFechaSalida(),
+            vuelo.getAsientosDisponibles(),
+            vuelo.getPrecio()
+        );
+    }
+
+    /**
+     * Exporta el itinerario del usuario a un archivo PDF.
+     */
+    public void exportarItinerarioAPDF() {
+        List<Reserva> reservas = reservaDAO.obtenerReservasPorUsuario(idUsuario);
+        if (reservas.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "❌ No tienes reservas para exportar.");
             return;
         }
 
-        if (insertarVueloEnBD(idAerolinea, numeroVuelo, origen, destino, fechaSalida, asientos, precio)) {
-            JOptionPane.showMessageDialog(this, "✅ Vuelo agregado a tu sistema.\nYa puedes reservar asientos.");
-            cargarVuelos();
-        } else {
-            JOptionPane.showMessageDialog(this, "❌ No se pudo agregar el vuelo.");
+        // Seleccionar ubicación del archivo
+        javax.swing.JFileChooser chooser = new javax.swing.JFileChooser();
+        chooser.setDialogTitle("Guardar itinerario como PDF");
+        chooser.setSelectedFile(new File("Itinerario_" + idUsuario + ".pdf"));
+        int result = chooser.showSaveDialog(null);
+
+        if (result != javax.swing.JFileChooser.APPROVE_OPTION) {
+            return; // Cancelado
+        }
+
+        File archivo = chooser.getSelectedFile();
+        if (!archivo.getName().toLowerCase().endsWith(".pdf")) {
+            archivo = new File(archivo.getPath() + ".pdf");
+        }
+
+        try {
+            // Crear documento PDF con OpenPDF
+            Document document = new Document();
+            PdfWriter.getInstance(document, new FileOutputStream(archivo));
+            document.open();
+
+            // Definir fuentes
+            Font titleFont = new Font(Font.HELVETICA, 18, Font.BOLD);
+            Font headerFont = new Font(Font.HELVETICA, 12, Font.BOLD);
+            Font normalFont = new Font(Font.HELVETICA, 10, Font.NORMAL);
+            Font smallFont = new Font(Font.HELVETICA, 9, Font.NORMAL);
+
+            // Título principal
+            Paragraph title = new Paragraph("ITINERARIO DE VUELOS", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            title.setSpacingAfter(20);
+            document.add(title);
+
+            // Información del usuario
+            Paragraph userIdPara = new Paragraph();
+            userIdPara.add(new Chunk("Usuario ID: ", headerFont));
+            userIdPara.add(new Chunk(String.valueOf(idUsuario), normalFont));
+            document.add(userIdPara);
+
+            Paragraph datePara = new Paragraph();
+            datePara.add(new Chunk("Fecha de generación: ", headerFont));
+            datePara.add(new Chunk(java.time.LocalDateTime.now().format(formatter), normalFont));
+            datePara.setSpacingAfter(20);
+            document.add(datePara);
+
+            // Crear tabla con 6 columnas
+            PdfPTable table = new PdfPTable(6);
+            table.setWidthPercentage(100);
+            float[] columnWidths = {15f, 25f, 20f, 10f, 15f, 15f};
+            table.setWidths(columnWidths);
+
+            // Color de fondo para encabezados
+            Color headerColor = new Color(230, 230, 230);
+
+            // Agregar encabezados de tabla
+            String[] headers = {"Vuelo", "Ruta", "Salida", "Asientos", "Precio Total", "Estado"};
+            for (String header : headers) {
+                PdfPCell headerCell = new PdfPCell(new Phrase(header, headerFont));
+                headerCell.setBackgroundColor(headerColor);
+                headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                headerCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                headerCell.setPadding(8);
+                headerCell.setBorderWidth(1);
+                table.addCell(headerCell);
+            }
+
+            // Agregar datos de las reservas
+            double totalGeneral = 0;
+            for (Reserva reserva : reservas) {
+                double precioTotal = reserva.getVuelo().getPrecio() * reserva.getCantidadAsientos();
+                totalGeneral += precioTotal;
+                String ruta = reserva.getVuelo().getOrigen() + " → " + reserva.getVuelo().getDestino();
+                String salida = reserva.getVuelo().getFechaSalida().format(formatter);
+
+                // Celda Vuelo
+                PdfPCell cellVuelo = new PdfPCell(new Phrase(reserva.getVuelo().getNumeroVuelo(), normalFont));
+                cellVuelo.setPadding(5);
+                table.addCell(cellVuelo);
+
+                // Celda Ruta
+                PdfPCell cellRuta = new PdfPCell(new Phrase(ruta, smallFont));
+                cellRuta.setPadding(5);
+                table.addCell(cellRuta);
+
+                // Celda Salida
+                PdfPCell cellSalida = new PdfPCell(new Phrase(salida, smallFont));
+                cellSalida.setPadding(5);
+                table.addCell(cellSalida);
+
+                // Celda Asientos (centrado)
+                PdfPCell cellAsientos = new PdfPCell(new Phrase(String.valueOf(reserva.getCantidadAsientos()), normalFont));
+                cellAsientos.setHorizontalAlignment(Element.ALIGN_CENTER);
+                cellAsientos.setPadding(5);
+                table.addCell(cellAsientos);
+
+                // Celda Precio (alineado a la derecha)
+                PdfPCell cellPrecio = new PdfPCell(new Phrase("$" + String.format("%.2f", precioTotal), normalFont));
+                cellPrecio.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                cellPrecio.setPadding(5);
+                table.addCell(cellPrecio);
+
+                // Celda Estado (centrado)
+                PdfPCell cellEstado = new PdfPCell(new Phrase(reserva.getEstado(), normalFont));
+                cellEstado.setHorizontalAlignment(Element.ALIGN_CENTER);
+                cellEstado.setPadding(5);
+                table.addCell(cellEstado);
+            }
+
+            // Agregar tabla al documento
+            document.add(table);
+
+            // Agregar resumen
+            Paragraph espaciado = new Paragraph(" ");
+            espaciado.setSpacingBefore(20);
+            document.add(espaciado);
+
+            Paragraph tituloResumen = new Paragraph("RESUMEN", headerFont);
+            tituloResumen.setAlignment(Element.ALIGN_RIGHT);
+            document.add(tituloResumen);
+
+            Paragraph totalReservas = new Paragraph();
+            totalReservas.add(new Chunk("Total de reservas: ", normalFont));
+            totalReservas.add(new Chunk(String.valueOf(reservas.size()), headerFont));
+            totalReservas.setAlignment(Element.ALIGN_RIGHT);
+            document.add(totalReservas);
+
+            Paragraph montoTotal = new Paragraph();
+            montoTotal.add(new Chunk("Monto total: ", normalFont));
+            montoTotal.add(new Chunk("$" + String.format("%.2f", totalGeneral), headerFont));
+            montoTotal.setAlignment(Element.ALIGN_RIGHT);
+            document.add(montoTotal);
+
+            // Cerrar documento
+            document.close();
+
+            JOptionPane.showMessageDialog(null, "✅ Itinerario exportado exitosamente como PDF:\n" + archivo.getAbsolutePath());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "❌ Error al generar el PDF:\n" + e.getMessage());
         }
     }
+
+    // === MÉTODOS AUXILIARES PARA BASE DE DATOS ===
 
     private int obtenerOCrearAerolinea(String nombre) {
         String sqlSelect = "SELECT id_aerolinea FROM Aerolinea WHERE nombre = ?";
@@ -383,10 +318,9 @@ public class SistemaReservasGUI extends JFrame {
             stmt = conn.prepareStatement(sqlInsert);
             stmt.setString(1, nombre);
             stmt.setString(2, codigo);
-
             ResultSet result = stmt.executeQuery();
             if (result.next()) {
-                return (int) result.getDouble(1); // SCOPE_IDENTITY() devuelve NUMERIC
+                return (int) result.getDouble(1);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -408,7 +342,7 @@ public class SistemaReservasGUI extends JFrame {
             stmt.setString(3, origen);
             stmt.setString(4, destino);
             stmt.setObject(5, fechaSalida);
-            stmt.setObject(6, fechaSalida.plusHours(2)); // Llegada estimada
+            stmt.setObject(6, fechaSalida.plusHours(2));
             stmt.setInt(7, asientos);
             stmt.setInt(8, asientos);
             stmt.setDouble(9, precio);
@@ -423,114 +357,12 @@ public class SistemaReservasGUI extends JFrame {
         }
     }
 
-    private void cargarReservas() {
-        modeloReservas.setRowCount(0);
-        List<Reserva> reservas = reservaDAO.obtenerReservasPorUsuario(idUsuario);
-
-        for (Reserva r : reservas) {
-            double precioTotal = r.getVuelo().getPrecio() * r.getCantidadAsientos();
-            modeloReservas.addRow(new Object[]{
-                r.getIdReserva(),
-                r.getVuelo().getNumeroVuelo(),
-                r.getVuelo().getOrigen() + " → " + r.getVuelo().getDestino(),
-                r.getVuelo().getFechaSalida().format(formatter),
-                r.getCantidadAsientos(),
-                String.format("%.2f", precioTotal),
-                r.getFechaReserva().format(formatter)
-            });
-        }
+    // === Getters ===
+    public int getIdUsuario() {
+        return idUsuario;
     }
 
-    private void cancelarReserva() {
-        int fila = tablaReservas.getSelectedRow();
-        if (fila == -1) {
-            JOptionPane.showMessageDialog(this, "⚠️ Seleccione una reserva para cancelar.");
-            return;
-        }
-
-        int idReserva = (int) modeloReservas.getValueAt(fila, 0);
-        int confirm = JOptionPane.showConfirmDialog(
-            this,
-            "¿Está seguro de cancelar la reserva #" + idReserva + "?",
-            "Confirmar Cancelación",
-            JOptionPane.YES_NO_OPTION
-        );
-
-        if (confirm == JOptionPane.YES_OPTION) {
-            if (reservaDAO.cancelarReserva(idReserva)) {
-                JOptionPane.showMessageDialog(this, "✅ Reserva cancelada con éxito.");
-                cargarReservas();
-                cargarVuelos();
-            } else {
-                JOptionPane.showMessageDialog(this, "❌ No se pudo cancelar la reserva.");
-            }
-        }
-    }
-
-    // === EXPORTAR A PDF ===
- private void exportarItinerarioACSV() {
-    // Obtener reservas del usuario
-    List<Reserva> reservas = reservaDAO.obtenerReservasPorUsuario(idUsuario);
-    if (reservas.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "❌ No tienes reservas para exportar.");
-        return;
-    }
-
-    // Seleccionar ubicación del archivo
-    JFileChooser chooser = new JFileChooser();
-    chooser.setDialogTitle("Guardar itinerario como CSV");
-    chooser.setSelectedFile(new java.io.File("Itinerario_" + idUsuario + ".csv"));
-    int result = chooser.showSaveDialog(this);
-
-    if (result != JFileChooser.APPROVE_OPTION) {
-        return; // Cancelado
-    }
-
-    java.io.File archivo = chooser.getSelectedFile();
-    if (!archivo.getName().toLowerCase().endsWith(".csv")) {
-        archivo = new java.io.File(archivo.getPath() + ".csv");
-    }
-
-    try (java.io.PrintWriter writer = new java.io.PrintWriter(archivo, "UTF-8")) {
-        // Escribir encabezados
-        writer.println("Vuelo,Ruta,Salida,Asientos,Precio Total,Estado,Fecha Reserva");
-
-        // Escribir filas
-        for (Reserva r : reservas) {
-            double precioTotal = r.getVuelo().getPrecio() * r.getCantidadAsientos();
-            String ruta = r.getVuelo().getOrigen() + " → " + r.getVuelo().getDestino();
-            String salida = r.getVuelo().getFechaSalida().format(formatter);
-            String fechaReserva = r.getFechaReserva().format(formatter);
-
-            // Escapar comillas y campos con comas
-            String linea = String.format("%s,\"%s\",\"%s\",%d,%.2f,%s,\"%s\"",
-                r.getVuelo().getNumeroVuelo(),
-                ruta,
-                salida,
-                r.getCantidadAsientos(),
-                precioTotal,
-                r.getEstado(),
-                fechaReserva
-            );
-
-            writer.println(linea);
-        }
-
-        JOptionPane.showMessageDialog(this, "✅ Itinerario exportado como CSV:\n" + archivo.getAbsolutePath());
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "❌ Error al guardar el archivo:\n" + e.getMessage());
-    }
-}
-    // === Main ===
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            new SistemaReservasGUI().setVisible(true);
-        });
+    public String getNombreUsuario() {
+        return nombreUsuario;
     }
 }

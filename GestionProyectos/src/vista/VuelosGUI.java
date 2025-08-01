@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package vista;
 
 import dao.ReservaDAO;
@@ -58,10 +55,6 @@ public class VuelosGUI extends javax.swing.JFrame {
 
     }
    
-
-
-    
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -90,34 +83,54 @@ public class VuelosGUI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jPanel2.setBackground(new java.awt.Color(0, 0, 0));
+        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblFiltroBusqueda.setForeground(new java.awt.Color(255, 255, 255));
         lblFiltroBusqueda.setText("Filtros de busqueda");
+        jPanel2.add(lblFiltroBusqueda, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 18, 165, -1));
 
+        lblTextoOrigen.setForeground(new java.awt.Color(255, 255, 255));
         lblTextoOrigen.setText("Origen:");
+        jPanel2.add(lblTextoOrigen, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 55, -1, -1));
+        jPanel2.add(txtOrigen, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 52, 71, -1));
 
+        lblDestino.setForeground(new java.awt.Color(255, 255, 255));
         lblDestino.setText("Destino:");
+        jPanel2.add(lblDestino, new org.netbeans.lib.awtextra.AbsoluteConstraints(157, 55, 49, -1));
+        jPanel2.add(txtDestino, new org.netbeans.lib.awtextra.AbsoluteConstraints(224, 52, 71, -1));
 
+        lblFecha.setForeground(new java.awt.Color(255, 255, 255));
         lblFecha.setText("Fecha:");
+        jPanel2.add(lblFecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(313, 55, -1, -1));
+        jPanel2.add(SpinnerFecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(364, 52, 78, -1));
 
+        btnBuscarVuelo.setForeground(new java.awt.Color(255, 255, 255));
         btnBuscarVuelo.setText("Buscar vuelo");
         btnBuscarVuelo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnBuscarVueloActionPerformed(evt);
             }
         });
+        jPanel2.add(btnBuscarVuelo, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 52, -1, -1));
 
+        btnLimpiar.setForeground(new java.awt.Color(255, 255, 255));
         btnLimpiar.setText("Limpiar");
         btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnLimpiarActionPerformed(evt);
             }
         });
+        jPanel2.add(btnLimpiar, new org.netbeans.lib.awtextra.AbsoluteConstraints(586, 52, -1, -1));
 
+        btnVuelosAire.setForeground(new java.awt.Color(255, 255, 255));
         btnVuelosAire.setText("Vuelos en el aire");
         btnVuelosAire.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnVuelosAireActionPerformed(evt);
             }
         });
+        jPanel2.add(btnVuelosAire, new org.netbeans.lib.awtextra.AbsoluteConstraints(699, 52, -1, -1));
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -148,12 +161,15 @@ public class VuelosGUI extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTable1);
 
+        jPanel2.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 102, 825, -1));
+
         btnHacerReserva.setText("Hacer reserva");
         btnHacerReserva.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnHacerReservaActionPerformed(evt);
             }
         });
+        jPanel2.add(btnHacerReserva, new org.netbeans.lib.awtextra.AbsoluteConstraints(166, 547, -1, -1));
 
         btnAgregarASistema.setText("Agregar a mi sistema ");
         btnAgregarASistema.addActionListener(new java.awt.event.ActionListener() {
@@ -161,6 +177,7 @@ public class VuelosGUI extends javax.swing.JFrame {
                 btnAgregarASistemaActionPerformed(evt);
             }
         });
+        jPanel2.add(btnAgregarASistema, new org.netbeans.lib.awtextra.AbsoluteConstraints(344, 547, -1, -1));
 
         btnIrIntinerario.setText("Intinerario");
         btnIrIntinerario.addActionListener(new java.awt.event.ActionListener() {
@@ -168,72 +185,7 @@ public class VuelosGUI extends javax.swing.JFrame {
                 btnIrIntinerarioActionPerformed(evt);
             }
         });
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(lblFiltroBusqueda, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(166, 166, 166)
-                        .addComponent(btnHacerReserva)
-                        .addGap(76, 76, 76)
-                        .addComponent(btnAgregarASistema)
-                        .addGap(91, 91, 91)
-                        .addComponent(btnIrIntinerario, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(30, 30, 30)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 825, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(lblTextoOrigen)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtOrigen, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblDestino, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(txtDestino, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(lblFecha)
-                                .addGap(18, 18, 18)
-                                .addComponent(SpinnerFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnBuscarVuelo)
-                                .addGap(30, 30, 30)
-                                .addComponent(btnLimpiar)
-                                .addGap(41, 41, 41)
-                                .addComponent(btnVuelosAire)))))
-                .addContainerGap(44, Short.MAX_VALUE))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(18, 18, 18)
-                .addComponent(lblFiltroBusqueda)
-                .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblTextoOrigen)
-                    .addComponent(txtOrigen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblDestino)
-                    .addComponent(txtDestino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblFecha)
-                    .addComponent(SpinnerFecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnBuscarVuelo)
-                    .addComponent(btnLimpiar)
-                    .addComponent(btnVuelosAire))
-                .addGap(27, 27, 27)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnHacerReserva)
-                    .addComponent(btnAgregarASistema)
-                    .addComponent(btnIrIntinerario))
-                .addContainerGap(31, Short.MAX_VALUE))
-        );
+        jPanel2.add(btnIrIntinerario, new org.netbeans.lib.awtextra.AbsoluteConstraints(581, 547, 99, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);

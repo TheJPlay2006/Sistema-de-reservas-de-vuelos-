@@ -179,6 +179,7 @@ public class VuelosGUI extends javax.swing.JFrame {
         });
         jPanel2.add(btnAgregarASistema, new org.netbeans.lib.awtextra.AbsoluteConstraints(344, 547, -1, -1));
 
+        btnIrIntinerario.setForeground(new java.awt.Color(255, 255, 255));
         btnIrIntinerario.setText("Intinerario");
         btnIrIntinerario.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

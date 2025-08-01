@@ -7,19 +7,23 @@ Proyecto académico desarrollado en **Java con NetBeans**, que simula un sistema
 ## 📸 Capturas de Pantalla
 
 ### 1. **Login**
-<img width="648" height="373" alt="image" src="https://github.com/user-attachments/assets/d07f4453-f97d-4903-bb09-c66179468a14" />
+<img width="648" height="373" alt="Login del Sistema" src="https://github.com/user-attachments/assets/d07f4453-f97d-4903-bb09-c66179468a14" />
+
 *Pantalla de inicio de sesión con campos para email y contraseña.*
 
 ### 2. **Buscar Vuelos**
-<img width="975" height="666" alt="image" src="https://github.com/user-attachments/assets/fd2228ec-2d57-4669-9849-4ffff30b8eda" />
+<img width="975" height="666" alt="Interfaz de Búsqueda de Vuelos" src="https://github.com/user-attachments/assets/fd2228ec-2d57-4669-9849-4ffff30b8eda" />
+
 *Interfaz principal para buscar vuelos por origen, destino y fecha.*
 
 ### 3. **Itinerario del Usuario**
-<img width="975" height="666" alt="image" src="https://github.com/user-attachments/assets/2dc7794a-5b23-4c9e-9219-f4f17ae01171" />
+<img width="975" height="666" alt="Itinerario de Reservas" src="https://github.com/user-attachments/assets/2dc7794a-5b23-4c9e-9219-f4f17ae01171" />
+
 *Lista de reservas del usuario con opciones para cancelar o exportar a PDF.*
 
 ### 4. **PDF Generado**
-<img width="975" height="661" alt="image" src="https://github.com/user-attachments/assets/b537ceaf-0f73-497c-81f3-af35857d5fa3" />
+<img width="975" height="661" alt="PDF de Itinerario Exportado" src="https://github.com/user-attachments/assets/b537ceaf-0f73-497c-81f3-af35857d5fa3" />
+
 *Ejemplo de PDF generado con el itinerario de vuelos del usuario.*
 
 ---
@@ -136,14 +140,14 @@ Al hacer clic en **"Exportar a PDF"**, el sistema genera un archivo profesional 
 ## 🧑‍🏫 Información del Proyecto
 
 ### **Autor**
-**Juan Pérez**  
-Estudiante de Ingeniería de Sistemas  
-Universidad [Nombre]
+**Jairo Steven Herrera Romero**  
+Estudiante de Ingeniería en Tecnologías de la Información  
+Universidad Técnica Nacional (UTN)
 
 ### **📂 Repositorio**
 Este proyecto fue desarrollado como parte de la asignatura **Gestión de Proyectos de Software**.
 
-🔗 **Repositorio GitHub**: [https://github.com/tu-usuario/GestionProyectos](https://github.com/tu-usuario/GestionProyectos)
+🔗 **Repositorio GitHub**: [https://github.com/TheJPlay2006/Sistema-de-reservas-de-vuelos-](https://github.com/TheJPlay2006/Sistema-de-reservas-de-vuelos-)
 
 ---
 
@@ -194,12 +198,33 @@ Este es un proyecto académico desarrollado con fines educativos. Si encuentras 
 - Contactar al desarrollador
 
 ---
+
 ## 📦 Clonar el Repositorio
+
 Para obtener una copia del proyecto en tu máquina local, usa el siguiente comando:
-bash git clone (https://github.com/TheJPlay2006/Sistema-de-reservas-de-vuelos-.git)
+
+```bash
+git clone https://github.com/TheJPlay2006/Sistema-de-reservas-de-vuelos-.git
+```
 
 O si prefieres usar SSH:
-bashgit clone git@github.com:TheJPlay2006/Sistema-de-reservas-de-vuelos-.git
+
+```bash
+git clone git@github.com:TheJPlay2006/Sistema-de-reservas-de-vuelos-.git
+```
+
+### **Pasos después de clonar:**
+
+1. **Navega al directorio del proyecto:**
+   ```bash
+   cd Sistema-de-reservas-de-vuelos-
+   ```
+
+2. **Abre el proyecto en NetBeans:**
+   - `File` → `Open Project`
+   - Selecciona la carpeta del proyecto
+
+3. **Sigue los pasos de instalación** mencionados en la sección [🚀 Cómo Ejecutar el Proyecto](#-cómo-ejecutar-el-proyecto)
 
 ---
 
@@ -207,6 +232,8 @@ bashgit clone git@github.com:TheJPlay2006/Sistema-de-reservas-de-vuelos-.git
 
 **🎓 Desarrollado con ❤️ para fines educativos**
 
-*Proyecto de Gestión de Software - Universidad [Nombre]*
+*Proyecto de Gestión de Software - Universidad Técnica Nacional*
+
+⭐ **¡No olvides darle una estrella al repositorio si te fue útil!** ⭐
 
 </div>

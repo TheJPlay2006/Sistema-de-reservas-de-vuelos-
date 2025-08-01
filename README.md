@@ -1,59 +1,72 @@
-# 🛫 Sistema de Gestión de Reservas de Vuelo
+# 🛫 Sistema de Gestión de Reservas de Vuelos
 
-Proyecto académico desarrollado en **Java con NetBeans**, que simula un sistema completo de reservas de vuelos, con interfaz gráfica, base de datos SQL Server, autenticación de usuarios, y exportación de itinerarios.
+Proyecto académico desarrollado en **Java con NetBeans**, que simula un sistema completo de reservas de vuelos, con autenticación, búsqueda, API externa y generación de PDFs.
 
 ---
 
-## 📸 Captura de Pantalla
+## 📸 Capturas de Pantalla
 
-![Interfaz del sistema](capturas/interfaz.png)  
-*Interfaz principal con búsqueda, itinerario y exportación a PDF*
+### 1. **Login**
+<img width="648" height="373" alt="image" src="https://github.com/user-attachments/assets/d07f4453-f97d-4903-bb09-c66179468a14" />
+*Pantalla de inicio de sesión con campos para email y contraseña.*
+
+### 2. **Buscar Vuelos**
+<img width="975" height="666" alt="image" src="https://github.com/user-attachments/assets/fd2228ec-2d57-4669-9849-4ffff30b8eda" />
+*Interfaz principal para buscar vuelos por origen, destino y fecha.*
+
+### 3. **Itinerario del Usuario**
+<img width="975" height="666" alt="image" src="https://github.com/user-attachments/assets/2dc7794a-5b23-4c9e-9219-f4f17ae01171" />
+*Lista de reservas del usuario con opciones para cancelar o exportar a PDF.*
+
+### 4. **PDF Generado**
+<img width="975" height="661" alt="image" src="https://github.com/user-attachments/assets/b537ceaf-0f73-497c-81f3-af35857d5fa3" />
+*Ejemplo de PDF generado con el itinerario de vuelos del usuario.*
 
 ---
 
 ## 🎯 Funcionalidades Principales
 
-✅ **Autenticación de usuarios**  
-- Inicio de sesión y registro con contraseña  
+### ✅ **Autenticación de usuarios**
+- Inicio de sesión y registro con contraseña
 - Gestión de perfil por usuario
 
-✅ **Búsqueda de vuelos**  
-- Filtros por origen, destino y fecha  
+### ✅ **Búsqueda de vuelos**
+- Filtros por origen, destino y fecha
 - Resultados en tiempo real desde la base de datos
 
-✅ **Reservas con validación**  
-- Verificación de asientos disponibles  
-- Evita duplicados  
+### ✅ **Reservas con validación**
+- Verificación de asientos disponibles
+- Evita duplicados
 - Actualiza automáticamente la disponibilidad
 
-✅ **Itinerario de usuario**  
-- Lista todas las reservas confirmadas  
+### ✅ **Itinerario de usuario**
+- Lista todas las reservas confirmadas
 - Permite cancelar reservas
 
-✅ **Vuelos en tiempo real (API externa)**  
-- Integración con **OpenSky Network API**  
-- Muestra vuelos reales en tiempo real  
+### ✅ **Vuelos en tiempo real (API externa)**
+- Integración con **OpenSky Network API**
+- Muestra vuelos reales en tiempo real
 - Opción para agregarlos al sistema
 
-✅ **Exportación de itinerario a PDF**  
-- Genera un PDF profesional con el itinerario del usuario  
+### ✅ **Exportación de itinerario a PDF**
+- Genera un PDF profesional con el itinerario del usuario
 - Usa **OpenPDF** (fork moderno y gratuito de iText)
 
 ---
 
 ## 🛠️ Tecnologías Utilizadas
 
-| Tecnología | Uso |
-|----------|-----|
-| **Java 17+** | Lenguaje principal |
-| **NetBeans IDE** | Entorno de desarrollo |
-| **SQL Server** | Base de datos relacional |
-| **JDBC** | Conexión a base de datos |
-| **Swing** | Interfaz gráfica (GUI) |
-| **OpenPDF 1.3.30** | Generación de PDFs |  
-| **OpenSky API** | Datos de vuelos en tiempo real |
+| Tecnología | Uso | Versión |
+|----------|-----|---------|
+| **Java** | Lenguaje principal | 17+ |
+| **NetBeans IDE** | Entorno de desarrollo | - |
+| **SQL Server** | Base de datos relacional | Express |
+| **JDBC** | Conexión a base de datos | - |
+| **Swing** | Interfaz gráfica (GUI) | - |
+| **OpenPDF** | Generación de PDFs | 1.3.30 |
+| **OpenSky API** | Datos de vuelos en tiempo real | - |
 
-🔗 **OpenPDF**: [https://mvnrepository.com/artifact/com.github.librepdf/openpdf/1.3.30](https://mvnrepository.com/artifact/com.github.librepdf/openpdf/1.3.30)
+🔗 **OpenPDF**: [Maven Repository](https://mvnrepository.com/artifact/com.github.librepdf/openpdf/1.3.30)
 
 ---
 
@@ -62,162 +75,137 @@ Proyecto académico desarrollado en **Java con NetBeans**, que simula un sistema
 ```
 GestionProyectos/
 ├── src/
-│   ├── modelo/                # Clases POJO: Vuelo, Usuario, Reserva, etc.
-│   ├── dao/                   # Data Access Objects
-│   ├── vista/                 # Interfaz gráfica (Swing)
-│   ├── util/                  # Conexión, API, herramientas
-│   └── Main.java
+│   ├── modelo/                 # Clases POJO: Vuelo, Usuario, Reserva, etc.
+│   ├── dao/                    # Data Access Objects
+│   ├── vista/                  # Interfaz gráfica (Swing)
+│   ├── util/                   # Conexión, API, herramientas
+│   └── Main.java               # Clase principal
 ├── lib/
-│   ├── openpdf-1.3.30.jar     # Librería para generar PDFs
-│   └── slf4j-api-1.7.32.jar   # Requerido por OpenPDF
+│   ├── openpdf-1.3.30.jar      # Librería para generar PDFs
+│   ├── slf4j-api-1.7.32.jar    # Requerido por OpenPDF
+│   └── slf4j-nop-1.7.32.jar    # Opcional, elimina advertencias
 ├── bd/
-│   └── script_bd.sql          # Script para crear la base de datos
+│   └── script_bd.sql           # Script para crear la base de datos
 ├── capturas/
-│   └── interfaz.png           # Captura de pantalla
-└── build.xml                  # Archivo de construcción (Ant)
+│   ├── login.png               # Captura de pantalla de login
+│   ├── vuelos_gui.png          # Interfaz de búsqueda de vuelos
+│   ├── itinerario_gui.png      # Vista del itinerario
+│   └── pdf_ejemplo.png         # Ejemplo de PDF generado
+└── build.xml                   # Archivo de construcción (Ant)
 ```
 
 ---
 
 ## 🚀 Cómo Ejecutar el Proyecto
 
-### 1. Prerrequisitos
-- Java JDK 17 o superior
-- NetBeans IDE (recomendado)
-- SQL Server Express (instancia: `JPLAYLAPTOP\SQLEXPRESS`)
-- Base de datos `SistemaReservasVuelo` creada
+### 1. **Prerrequisitos**
+- ☑️ Java JDK 17 o superior
+- ☑️ NetBeans IDE (recomendado)
+- ☑️ SQL Server Express (instancia: `JPLAYLAPTOP\SQLEXPRESS`)
+- ☑️ Base de datos `SistemaReservasVuelo` creada
 
-### 2. Pasos de Instalación
-1. **Clona o abre el proyecto en NetBeans**
-2. **Añade las librerías a `lib/`**:
+### 2. **Pasos de Instalación**
+
+1. **📁 Clona o abre el proyecto en NetBeans**
+
+2. **📚 Añade las librerías a `lib/`:**
    - `openpdf-1.3.30.jar`
    - `slf4j-api-1.7.32.jar`
-3. **Ejecuta el script SQL** para crear la base de datos y tablas
-4. **Compila y ejecuta** `SistemaReservasGUI.java`
+   - `slf4j-nop-1.7.32.jar` *(opcional, para eliminar advertencias)*
 
-> ⚠️ **Nota**: Si usas otro nombre de instancia de SQL Server, actualiza la URL en `ConexionBD.java`.
+3. **🗄️ Ejecuta el script SQL** para crear la base de datos y tablas
 
----
+4. **▶️ Compila y ejecuta** `Main.java`
 
-## 💾 Script de Base de Datos
-
-Ejecuta este script en **SQL Server Management Studio (SSMS)** para crear la base de datos:
-
-```sql
--- script_bd.sql
-USE master;
-GO
-
-IF DB_ID('SistemaReservasVuelo') IS NOT NULL
-    DROP DATABASE SistemaReservasVuelo;
-GO
-
-CREATE DATABASE SistemaReservasVuelo;
-GO
-
-USE SistemaReservasVuelo;
-GO
-
--- Tabla Aerolinea
-CREATE TABLE Aerolinea (
-    id_aerolinea INT PRIMARY KEY IDENTITY(1,1),
-    nombre NVARCHAR(100) NOT NULL,
-    codigo NVARCHAR(10) NOT NULL
-);
-
--- Tabla Usuario
-CREATE TABLE Usuario (
-    id_usuario INT PRIMARY KEY IDENTITY(1,1),
-    nombre NVARCHAR(100) NOT NULL,
-    email NVARCHAR(100) NOT NULL UNIQUE,
-    telefono NVARCHAR(20),
-    fecha_registro DATETIME NOT NULL DEFAULT GETDATE(),
-    password NVARCHAR(255) NOT NULL DEFAULT '12345'
-);
-
--- Tabla Vuelo
-CREATE TABLE Vuelo (
-    id_vuelo INT PRIMARY KEY IDENTITY(1,1),
-    id_aerolinea INT FOREIGN KEY REFERENCES Aerolinea(id_aerolinea),
-    numero_vuelo NVARCHAR(20) NOT NULL,
-    origen NVARCHAR(100) NOT NULL,
-    destino NVARCHAR(100) NOT NULL,
-    fecha_salida DATETIME NOT NULL,
-    fecha_llegada DATETIME NOT NULL,
-    asientos_totales INT NOT NULL,
-    asientos_disponibles INT NOT NULL,
-    precio DECIMAL(10,2) NOT NULL,
-    escalas INT NOT NULL,
-    estado NVARCHAR(20) NOT NULL
-);
-
--- Tabla Reserva
-CREATE TABLE Reserva (
-    id_reserva INT PRIMARY KEY IDENTITY(1,1),
-    id_usuario INT FOREIGN KEY REFERENCES Usuario(id_usuario),
-    id_vuelo INT FOREIGN KEY REFERENCES Vuelo(id_vuelo),
-    fecha_reserva DATETIME NOT NULL DEFAULT GETDATE(),
-    estado NVARCHAR(20) NOT NULL,
-    cantidad_asientos INT NOT NULL
-);
-
--- Procedimiento almacenado para insertar reserva
-CREATE PROCEDURE sp_insertar_reserva
-    @id_usuario INT,
-    @id_vuelo INT,
-    @cantidad_asientos INT,
-    @id_reserva_generada INT OUTPUT
-AS
-BEGIN
-    SET NOCOUNT ON;
-    INSERT INTO Reserva (id_usuario, id_vuelo, cantidad_asientos, estado)
-    VALUES (@id_usuario, @id_vuelo, @cantidad_asientos, 'Confirmada');
-    SET @id_reserva_generada = SCOPE_IDENTITY();
-END
-GO
-```
+> ⚠️ **Importante**: Si usas otro nombre de instancia de SQL Server, actualiza la URL en `ConexionBD.java`.
 
 ---
 
-## 🔧 Configuración Adicional
+## 💾 Exportación a PDF
 
-### Conexión a Base de Datos
-Asegúrate de que la cadena de conexión en `ConexionBD.java` coincida con tu configuración:
+Al hacer clic en **"Exportar a PDF"**, el sistema genera un archivo profesional que contiene:
 
-```java
-String url = "jdbc:sqlserver://JPLAYLAPTOP\\SQLEXPRESS:1433;databaseName=SistemaReservasVuelo;encrypt=false;";
-```
-
-### API Externa
-El sistema utiliza la **OpenSky Network API** para obtener datos de vuelos en tiempo real. No requiere autenticación para uso básico.
+📋 **Contenido del PDF:**
+- **Encabezado**: Título y nombre del usuario
+- **Tabla detallada**: Vuelos reservados con información completa
+- **Información incluida**: Precios, rutas, fechas y horarios
+- **Pie de página**: Fecha de emisión del documento
 
 ---
 
-## 🎓 Características del Proyecto
+## 🧑‍🏫 Información del Proyecto
 
-Este proyecto académico demuestra:
-- Arquitectura en capas (DAO, Modelo, Vista)
-- Manejo de base de datos relacionales
-- Integración con APIs externas
-- Generación de documentos PDF
-- Validación de datos y manejo de errores
-- Interfaz gráfica con Swing
+### **Autor**
+**Juan Pérez**  
+Estudiante de Ingeniería de Sistemas  
+Universidad [Nombre]
+
+### **📂 Repositorio**
+Este proyecto fue desarrollado como parte de la asignatura **Gestión de Proyectos de Software**.
+
+🔗 **Repositorio GitHub**: [https://github.com/tu-usuario/GestionProyectos](https://github.com/tu-usuario/GestionProyectos)
 
 ---
 
-## 📝 Notas del Desarrollador
+## 🏆 Características Técnicas
 
-- La contraseña por defecto para nuevos usuarios es `12345`
-- El sistema valida automáticamente la disponibilidad de asientos
-- Los PDFs se generan con información completa del itinerario
-- La integración con OpenSky API permite visualizar vuelos reales
+Este sistema demuestra la integración completa de:
+
+### **🏗️ Arquitectura en Capas**
+- **Presentación**: Interfaz gráfica con Swing
+- **Negocio**: Lógica de aplicación con DAOs
+- **Datos**: Persistencia en SQL Server
+- **Servicios**: Integración con API externa
+- **Documentos**: Generación automática de PDFs
+
+### **🔧 Patrones Implementados**
+- **DAO (Data Access Object)**: Abstracción de acceso a datos
+- **MVC (Model-View-Controller)**: Separación de responsabilidades
+- **Factory**: Creación de conexiones a base de datos
+
+---
+
+## 🎯 Objetivos Académicos Cumplidos
+
+✅ **Desarrollo de aplicaciones desktop en Java**  
+✅ **Integración con bases de datos relacionales**  
+✅ **Consumo de APIs REST externas**  
+✅ **Generación de documentos PDF**  
+✅ **Implementación de patrones de diseño**  
+✅ **Validación y manejo de errores**  
+✅ **Interfaz de usuario intuitiva**
+
+---
+
+## 📝 Notas de Desarrollo
+
+- **Contraseña por defecto**: `12345` para nuevos usuarios
+- **Validación automática**: El sistema verifica disponibilidad de asientos
+- **API externa**: OpenSky Network no requiere autenticación
+- **PDFs**: Se generan con información completa y formato profesional
 
 ---
 
 ## 🤝 Contribuciones
 
-Este es un proyecto académico. Si encuentras algún error o mejora, no dudes en crear un issue o pull request.
+Este es un proyecto académico desarrollado con fines educativos. Si encuentras algún error o tienes sugerencias de mejora, no dudes en:
+- Crear un **issue** en el repositorio
+- Enviar un **pull request** con mejoras
+- Contactar al desarrollador
+
+---
+## 📦 Clonar el Repositorio
+Para obtener una copia del proyecto en tu máquina local, usa el siguiente comando:
+bashgit clone https://github.com/tu-usuario/GestionProyectos.git
+O si prefieres usar SSH:
+bashgit clone git@github.com:tu-usuario/GestionProyectos.git
 
 ---
 
-**Desarrollado con ❤️ para fines educativos**
+<div align="center">
+
+**🎓 Desarrollado con ❤️ para fines educativos**
+
+*Proyecto de Gestión de Software - Universidad [Nombre]*
+
+</div>

@@ -196,9 +196,10 @@ Este es un proyecto académico desarrollado con fines educativos. Si encuentras 
 ---
 ## 📦 Clonar el Repositorio
 Para obtener una copia del proyecto en tu máquina local, usa el siguiente comando:
-bashgit clone https://github.com/tu-usuario/GestionProyectos.git
+bash git clone (https://github.com/TheJPlay2006/Sistema-de-reservas-de-vuelos-.git)
+
 O si prefieres usar SSH:
-bashgit clone git@github.com:tu-usuario/GestionProyectos.git
+bashgit clone git@github.com:TheJPlay2006/Sistema-de-reservas-de-vuelos-.git
 
 ---
 
